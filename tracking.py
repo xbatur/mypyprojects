@@ -30,7 +30,7 @@ class TrackWebcam():
 
   def capture(self):
     try:
-      print("BURAYA GELDIM")
+      #print("BURAYA GELDIM")
       url = 'http://{}:8080/shot.jpg'.format(self.ip_adress)
       imgResp = urllib.request.urlopen(url)
       # Numpy to convert into a array
@@ -74,13 +74,14 @@ class TrackWebcam():
             cv2.destroyWindow(winName)
             sys.exit(0)
         except Exception as msg:
-          print(str(msg))
+          print(self.FAIL + str(msg) + self.ENDC)
           cv2.destroyAllWindows()
           main()
     except Exception as msg:
       #index = self.old_urls.index(self.org)
       #del self.old_urls[index]
       cv2.destroyAllWindows()
+      self.memory.append(self.ip_adress)
       TrackWebcam.giveme_url(self)
 
   def file_work(self):
@@ -89,6 +90,7 @@ class TrackWebcam():
         with open("ip_list.txt") as f:
           content = f.readlines()
         self.old_urls = [x.strip() for x in content]
+        set(self.old_urls)
         self.trry = True
     else:
       dosya = open("ip_list.txt",'w')
@@ -96,6 +98,16 @@ class TrackWebcam():
 
   def giveme_url(self):
     self.ip_adress = input("GIVE URL> ")
+    if self.ip_adress == 'q':
+      sys.exit()
+    if len(self.ip_adress) < 11:
+      print("URL MUST BE LONG THAN 11 CHARS")
+      TrackWebcam.giveme_url(self)
+    for x in range(len(self.memory)):
+      #print(self.memory)
+      if self.ip_adress in self.memory[x]:
+        print("THIS ADRESS IS OLD! NOT WORKING")
+        TrackWebcam.giveme_url(self)
     if self.error == True:
       dosya = open('ip_list.txt', 'a')
       print(self.ip_adress,file=dosya)
@@ -105,16 +117,21 @@ class TrackWebcam():
 
   def try_url(self):
     try:
-      print("TRYING URLS FROM IP LIST....")
+      print(self.HEADER + "TRYING URLS FROM IP LIST...." + self .ENDC)
       print("============================")
-      #time.sleep(1)
+      if not self.old_urls:
+        self.error = True
+        TrackWebcam.giveme_url(self)
       for x in range(len(self.old_urls)):
-        url = 'http://{}:8080/shot.jpg'.format(self.old_urls[x])
-        print(url)
-        self.memory.append(self.old_urls[x])
-        print(urllib.request.urlopen(url))
-        self.ip_adress = self.old_urls[x]
-        TrackWebcam.capture(self)
+        if self.old_urls[x] in self.memory:
+          del self.old_urls[x]
+        else:
+          url = 'http://{}:8080/shot.jpg'.format(self.old_urls[x])
+          print(url)
+          self.memory.append(self.old_urls[x])
+          openurl = urllib.request.urlopen(url)
+          self.ip_adress = self.old_urls[x]
+          TrackWebcam.capture(self)
     except Exception as msg:
       print(str(msg))
       for x in range(len(self.memory)):
@@ -126,29 +143,32 @@ class TrackWebcam():
         TrackWebcam.giveme_url(self)
 def main():
   Track = TrackWebcam()
-  print("WELCOME TRACK IP WEBCAM PROGRAM")
+  print(Track.OKGREEN + "WELCOME TRACK IP WEBCAM PROGRAM" + Track.ENDC)
   print("===============================")
-  if os.path.isfile("ip_list.txt"):
-    if os.stat("ip_list.txt") == 0:
-      #print("T1")
-      Thread1 = threading.Thread(target=Track.giveme_url)
-      Thread1.start()
-      Thread1.join()
+  try:
+    if os.path.isfile("ip_list.txt"):
+      if os.stat("ip_list.txt") == 0:
+        #print("T1")
+        Thread1 = threading.Thread(target=Track.giveme_url)
+        Thread1.start()
+        Thread1.join()
+      else:
+        if Track.trry == False:
+          #print("T2")
+          Thread2 = threading.Thread(target=Track.file_work)
+          Thread2.start()
+          Thread2.join()
+      if Track.trry == True:
+        #print("T4")
+        Thread4 = threading.Thread(target=Track.try_url)
+        Thread4.start()
+        Thread4.join()
     else:
-      if Track.trry == False:
-        #print("T2")
-        Thread2 = threading.Thread(target=Track.file_work)
-        Thread2.start()
-        Thread2.join()
-    if Track.trry == True:
-      #print("T4")
-      Thread4 = threading.Thread(target=Track.try_url)
-      Thread4.start()
-      Thread4.join()
-  else:
-    #print("T3")
-    Thread3 = threading.Thread(target=Track.file_work)
-    Thread3.start()
-    Thread3.join()
+      #print("T3")
+      Thread3 = threading.Thread(target=Track.file_work)
+      Thread3.start()
+      Thread3.join()
+  except KeyboardInterrupt:
+    sys.exit(0)
 
 main()
