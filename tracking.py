@@ -101,7 +101,7 @@ class TrackWebcam():
     if self.ip_adress == 'q':
       sys.exit()
     if self.ip_adress == 'rescan':
-      TrackWebcam.try_url(self)
+      main()
     if len(self.ip_adress) < 11:
       print(self.FAIL + "URL MUST BE LONG THAN 11 CHARS" + self.ENDC)
       TrackWebcam.giveme_url(self)
