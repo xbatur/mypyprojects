@@ -100,13 +100,15 @@ class TrackWebcam():
     self.ip_adress = input("GIVE URL> ")
     if self.ip_adress == 'q':
       sys.exit()
+    if self.ip_adress == 'rescan':
+      TrackWebcam.try_url(self)
     if len(self.ip_adress) < 11:
-      print("URL MUST BE LONG THAN 11 CHARS")
+      print(self.FAIL + "URL MUST BE LONG THAN 11 CHARS" + self.ENDC)
       TrackWebcam.giveme_url(self)
     for x in range(len(self.memory)):
       #print(self.memory)
       if self.ip_adress in self.memory[x]:
-        print("THIS ADRESS IS OLD! NOT WORKING")
+        print(self.FAIL + "THIS ADRESS IS OLD! NOT WORKING" + self.ENDC)
         TrackWebcam.giveme_url(self)
     if self.error == True:
       dosya = open('ip_list.txt', 'a')
