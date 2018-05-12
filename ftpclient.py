@@ -6,7 +6,7 @@ class FTPCLIENT():
         self.ftp = FTP('')
     def connect(self):
         try:
-            self.ftp.connect('localhost',1026)
+            self.ftp.connect('IPADRESS',1026)
             self.ftp.login(user='xboomer',passwd='12345')
             self.ftp.dir()
             self.ftp.retrlines('LIST')
