@@ -70,19 +70,24 @@ def main():
         Dwn = YDown()
         print(Dwn.HEADER + "Welcome MP3 download pc /upload phone over FTP program." + Dwn.ENDC)
         while 1:
-            if not Dwn.ip_adress:
+            while len(Dwn.ip_adress) < 11:
                 Dwn.ip_adress = input(Dwn.OKGREEN + "Give IP Adress> " + Dwn.ENDC)
             Dwn.url = input(Dwn.OKBLUE + "Give Youtube URL: " + Dwn.ENDC)
             if Dwn.url == 'q':
                 sys.exit(0)
             val1 = Dwn.download()
             if val1 != -1:
+                print("\a")
                 print(Dwn.OKGREEN + "DOWNLOAD SUCCESSFUL" + Dwn.ENDC)
                 print(Dwn.OKGREEN + "===================" + Dwn.ENDC)
             val2 = Dwn.uploadphone()
             if val2 != -1:
+                print("\a")
                 print(Dwn.OKGREEN + "UPLOAD SUCCESSFUL" + Dwn.ENDC)
                 print(Dwn.OKGREEN + "=================" + Dwn.ENDC)
+            if val2 == -1:
+                Dwn.ip_adress = input(Dwn.OKGREEN + "Give IP Adress> " + Dwn.ENDC)
     except KeyboardInterrupt:
+        print("\a")
         sys.exit(0)
 main()
